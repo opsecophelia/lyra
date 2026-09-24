@@ -682,7 +682,7 @@ local function Card(parent, order, height)
         Parent = parent,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
-    Acrylic:Add(card, 0.2)
+    Acrylic:Add(card, 0.3)
     Corner(8, card)
     Stroke(card, "BorderSoft")
     return card
@@ -782,7 +782,7 @@ function Lyra:Notify(opts)
         Parent = holder,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
-    Acrylic:Add(card, 0.08)
+    Acrylic:Add(card, 0.12)
     Corner(10, card)
     Stroke(card, "Border")
 
@@ -840,8 +840,8 @@ function Lyra:Notify(opts)
         track = New("Frame", {
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, 2),
+            Position = UDim2.new(0, 11, 1, -1),
+            Size = UDim2.new(1, -22, 0, 2),
             Parent = card,
         })
         bar = New("Frame", {
@@ -916,7 +916,7 @@ local function CreateDialog(opts)
         Parent = dim,
     })
     Paint(card, { BackgroundColor3 = "Base" })
-    Acrylic:Add(card, 0.06)
+    Acrylic:Add(card, 0.12)
     Corner(12, card)
     Stroke(card, "Border")
     AttachShadow(card, 30, 0.5)
@@ -1109,7 +1109,7 @@ function Lyra:CreateWindow(opts)
         Parent = root,
     })
     Paint(main, { BackgroundColor3 = "Base" })
-    Acrylic:Add(main, 0.1)
+    Acrylic:Add(main, 0.2)
     Corner(12, main)
     Stroke(main, "Border")
 
@@ -1133,7 +1133,8 @@ function Lyra:CreateWindow(opts)
         Parent = main,
     })
     Paint(sidebar, { BackgroundColor3 = "Sidebar" })
-    Acrylic:Add(sidebar, 0.05)
+    Acrylic:Add(sidebar, 0.45)
+    Corner(12, sidebar)
 
     local sidebarEdge = New("Frame", {
         BorderSizePixel = 0,
@@ -1427,7 +1428,7 @@ function Lyra:CreateWindow(opts)
             local tick = New("Frame", {
                 BorderSizePixel = 0,
                 AnchorPoint = Vector2.new(0.5, 0.5),
-                Position = UDim2.new(1, -4 - (i - 1) * 4, 1, -4 - (i - 1) * 4),
+                Position = UDim2.new(1, -6 - (i - 1) * 4, 1, -6 - (i - 1) * 4),
                 Size = UDim2.fromOffset(len, 1),
                 Rotation = -45,
                 BackgroundTransparency = 0.55,
@@ -1481,7 +1482,7 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(minimizePill, { BackgroundColor3 = "Surface" })
-        Acrylic:Add(minimizePill, 0.1)
+        Acrylic:Add(minimizePill, 0.14)
         Corner(10, minimizePill)
         Stroke(minimizePill, "Border")
         AttachShadow(minimizePill, 20, 0.6)
@@ -1642,7 +1643,7 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(fab, { BackgroundColor3 = "Surface" })
-        Acrylic:Add(fab, 0.1)
+        Acrylic:Add(fab, 0.14)
         New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fab })
         Stroke(fab, "Border")
         AttachShadow(fab, 18, 0.6)
@@ -2296,7 +2297,7 @@ local function Popup(anchor, width, height)
         Parent = group,
     })
     Paint(body, { BackgroundColor3 = "Base" })
-    Acrylic:Add(body, 0.06)
+    Acrylic:Add(body, 0.12)
     Corner(10, body)
     Stroke(body, "Border")
 
