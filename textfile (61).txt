@@ -194,7 +194,7 @@ local function Text(props)
     p.TextSize  = p.TextSize or 13
     p.TextXAlignment = p.TextXAlignment or Enum.TextXAlignment.Left
     p.TextYAlignment = p.TextYAlignment or Enum.TextYAlignment.Center
-    p.RichText  = p.RichText == nil and true or p.RichText
+    p.RichText  = p.RichText == true   -- user strings are not markup
     return TrackFont(New("TextLabel", p), RoleOf(p.FontFace))
 end
 
@@ -306,6 +306,18 @@ local function Paint(inst, map)
     return inst
 end
 
+local ThemeHooks = {}
+
+local function OnThemeChange(fn)
+    table.insert(ThemeHooks, fn)
+end
+
+local function FireThemeHooks()
+    for i = #ThemeHooks, 1, -1 do
+        if not pcall(ThemeHooks[i]) then table.remove(ThemeHooks, i) end
+    end
+end
+
 local function RepaintAll()
     for i = #Registry, 1, -1 do
         local entry = Registry[i]
@@ -324,7 +336,7 @@ end
 -- a translucent panel sitting over a globally blurred world. It reads correctly,
 -- but the game behind the menu blurs too. Hence the toggle.
 
-local BLUR_SIZE = 14
+local BLUR_SIZE = 20
 
 local Acrylic = {
     Enabled  = false,
@@ -540,17 +552,21 @@ end
 
 local SHADOW_ASSET = "rbxassetid://6014261993"
 
-local function Shadow(parent, spread, transparency)
-    spread = spread or 26
+local SHADOW_BORDER = 49   -- the asset's 9-slice border, in pixels
+
+local function Shadow(parent, spread, transparency, offsetY)
+    spread  = spread or 22
+    offsetY = offsetY or 0
     local img = New("ImageLabel", {
         Name = "Shadow",
         BackgroundTransparency = 1,
         Image = SHADOW_ASSET,
-        ImageTransparency = transparency or 0.62,
+        ImageTransparency = transparency or 0.72,
         ScaleType = Enum.ScaleType.Slice,
         SliceCenter = Rect.new(49, 49, 450, 450),
+        SliceScale = spread / SHADOW_BORDER,
         AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, offsetY),
         Size = UDim2.new(1, spread * 2, 1, spread * 2),
         ZIndex = 0,
         Parent = parent,
@@ -561,15 +577,17 @@ end
 
 -- for elements that are not wrapped in a transparent holder: the shadow becomes a
 -- sibling that tracks the target's position and size
-local function AttachShadow(target, spread, transparency)
-    spread = spread or 22
+local function AttachShadow(target, spread, transparency, offsetY)
+    spread  = spread or 18
+    offsetY = offsetY or 0
     local img = New("ImageLabel", {
         Name = "Shadow",
         BackgroundTransparency = 1,
         Image = SHADOW_ASSET,
-        ImageTransparency = transparency or 0.62,
+        ImageTransparency = transparency or 0.72,
         ScaleType = Enum.ScaleType.Slice,
         SliceCenter = Rect.new(49, 49, 450, 450),
+        SliceScale = spread / SHADOW_BORDER,
         ZIndex = math.max(target.ZIndex - 1, 0),
         Visible = target.Visible,
         Parent = target.Parent,
@@ -578,7 +596,7 @@ local function AttachShadow(target, spread, transparency)
 
     local function sync()
         local p, sz = target.AbsolutePosition, target.AbsoluteSize
-        img.Position = UDim2.fromOffset(p.X - spread, p.Y - spread)
+        img.Position = UDim2.fromOffset(p.X - spread, p.Y - spread + offsetY)
         img.Size     = UDim2.fromOffset(sz.X + spread * 2, sz.Y + spread * 2)
     end
     target:GetPropertyChangedSignal("AbsolutePosition"):Connect(sync)
@@ -645,7 +663,17 @@ local function MakeDraggable(handle, target, onMove)
         or input.UserInputType == Enum.UserInputType.Touch then
             dragging   = true
             dragStart  = input.Position
-            startPos   = target.Position
+
+            -- convert whatever Position the target had into pure offsets,
+            -- so scale components can't be silently dropped mid-drag
+            local anchor = target.AnchorPoint
+            local abs    = target.AbsolutePosition
+            local sz     = target.AbsoluteSize
+            target.Position = UDim2.fromOffset(
+                math.floor(abs.X + anchor.X * sz.X),
+                math.floor(abs.Y + anchor.Y * sz.Y)
+            )
+            startPos = target.Position
             local conn
             conn = input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -661,14 +689,20 @@ local function MakeDraggable(handle, target, onMove)
         if input.UserInputType ~= Enum.UserInputType.MouseMovement
         and input.UserInputType ~= Enum.UserInputType.Touch then return end
 
-        local delta = input.Position - dragStart
-        local vp    = Camera.ViewportSize
-        local size  = target.AbsoluteSize
-        local x = startPos.X.Offset + delta.X
-        local y = startPos.Y.Offset + delta.Y
-        x = Clamp(x, -size.X + 90, vp.X - 90)
-        y = Clamp(y, 0, vp.Y - 44)
-        target.Position = UDim2.fromOffset(x, y)
+        local delta  = input.Position - dragStart
+        local vp     = Camera.ViewportSize
+        local size   = target.AbsoluteSize
+        local anchor = target.AnchorPoint
+
+        -- clamp the visible box, then convert back to the anchor's position
+        local left = startPos.X.Offset + delta.X - anchor.X * size.X
+        local top  = startPos.Y.Offset + delta.Y - anchor.Y * size.Y
+        left = Clamp(left, -size.X + 90, vp.X - 90)
+        top  = Clamp(top, 0, vp.Y - 44)
+        target.Position = UDim2.fromOffset(
+            left + anchor.X * size.X,
+            top + anchor.Y * size.Y
+        )
         if onMove then onMove() end
     end)
 end
@@ -682,7 +716,7 @@ local function Card(parent, order, height)
         Parent = parent,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
-    Acrylic:Add(card, 0.3)
+    Acrylic:Add(card, 0.16)
     Corner(8, card)
     Stroke(card, "BorderSoft")
     return card
@@ -782,7 +816,7 @@ function Lyra:Notify(opts)
         Parent = holder,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
-    Acrylic:Add(card, 0.12)
+    Acrylic:Add(card, 0.08)
     Corner(10, card)
     Stroke(card, "Border")
 
@@ -916,10 +950,10 @@ local function CreateDialog(opts)
         Parent = dim,
     })
     Paint(card, { BackgroundColor3 = "Base" })
-    Acrylic:Add(card, 0.12)
+    Acrylic:Add(card, 0.08)
     Corner(12, card)
     Stroke(card, "Border")
-    AttachShadow(card, 30, 0.5)
+    AttachShadow(card, 26, 0.62, 9)
 
     local inner = New("Frame", {
         BackgroundTransparency = 1,
@@ -1096,7 +1130,7 @@ function Lyra:CreateWindow(opts)
     })
     Window.Root = root
 
-    Shadow(root, 30, 0.55)
+    Shadow(root, 24, 0.74, 7)
 
     local main = New("Frame", {
         Name = "Main",
@@ -1109,7 +1143,7 @@ function Lyra:CreateWindow(opts)
         Parent = root,
     })
     Paint(main, { BackgroundColor3 = "Base" })
-    Acrylic:Add(main, 0.2)
+    Acrylic:Add(main, 0.13)
     Corner(12, main)
     Stroke(main, "Border")
 
@@ -1133,7 +1167,7 @@ function Lyra:CreateWindow(opts)
         Parent = main,
     })
     Paint(sidebar, { BackgroundColor3 = "Sidebar" })
-    Acrylic:Add(sidebar, 0.45)
+    Acrylic:Add(sidebar, 0.3)
     Corner(12, sidebar)
 
     local sidebarEdge = New("Frame", {
@@ -1394,7 +1428,7 @@ function Lyra:CreateWindow(opts)
         Name = "Pages",
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(0, 52),
-        Size = UDim2.new(1, 0, 1, -52),
+        Size = UDim2.new(1, -4, 1, -58),
         ClipsDescendants = true,
         ZIndex = 12,
         Parent = content,
@@ -1409,8 +1443,8 @@ function Lyra:CreateWindow(opts)
         ZIndex = 13,
         Parent = header,
     })
-    MakeDraggable(dragLayer, root)
-    MakeDraggable(brand, root)
+    MakeDraggable(dragLayer, root, CloseActivePopup)
+    MakeDraggable(brand, root, CloseActivePopup)
 
     ------------------------------------------------------------------ resizing
     if opts.Resizable ~= false then
@@ -1458,6 +1492,7 @@ function Lyra:CreateWindow(opts)
             if not resizing then return end
             if input.UserInputType ~= Enum.UserInputType.MouseMovement
             and input.UserInputType ~= Enum.UserInputType.Touch then return end
+            CloseActivePopup()
             local delta = input.Position - startPos
             root.Size = UDim2.fromOffset(
                 Clamp(startSize.X + delta.X, opts.MinWidth or 470, 1600),
@@ -1482,10 +1517,10 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(minimizePill, { BackgroundColor3 = "Surface" })
-        Acrylic:Add(minimizePill, 0.14)
+        Acrylic:Add(minimizePill, 0.1)
         Corner(10, minimizePill)
         Stroke(minimizePill, "Border")
-        AttachShadow(minimizePill, 20, 0.6)
+        AttachShadow(minimizePill, 14, 0.74, 4)
         Pad(minimizePill, 0, 12, 0, 12)
 
         local row = New("Frame", {
@@ -1584,7 +1619,7 @@ function Lyra:CreateWindow(opts)
 
     function Window:SetAcrylic(state)
         Acrylic:Set(state, self._open and not self._minimized)
-        Tween(topEdge, 0.2, { BackgroundTransparency = Acrylic.Enabled and 0.86 or 1 })
+        Tween(topEdge, 0.2, { BackgroundTransparency = Acrylic.Enabled and 0.9 or 1 })
         self.Acrylic = Acrylic.Enabled
         return Acrylic.Enabled
     end
@@ -1643,10 +1678,10 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(fab, { BackgroundColor3 = "Surface" })
-        Acrylic:Add(fab, 0.14)
+        Acrylic:Add(fab, 0.1)
         New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fab })
         Stroke(fab, "Border")
-        AttachShadow(fab, 18, 0.6)
+        AttachShadow(fab, 14, 0.74, 4)
         local img = New("ImageLabel", {
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1779,7 +1814,7 @@ function Lyra:CreateWindow(opts)
             ZIndex = 12,
             Parent = page,
         })
-        Pad(scroller, 14, 16, 16, 16)
+        Pad(scroller, 14, 12, 10, 16)
         List(scroller, 7)
 
         tab._btn, tab._label, tab._icon = btn, label, icon
@@ -1821,7 +1856,7 @@ function Lyra:CreateWindow(opts)
     main.Size = UDim2.fromScale(0.96, 0.96)
     Tween(main, 0.3, { Size = UDim2.fromScale(1, 1) }, Enum.EasingStyle.Quint)
 
-    Window:SetAcrylic(opts.Acrylic ~= false)
+    Window:SetAcrylic(opts.Acrylic == true)
 
     if AttachConfig then AttachConfig(Window, opts) end
 
@@ -1987,8 +2022,15 @@ function Elements.Button(tab, opts, order)
 
     local hit = Hitbox(card, 20)
     HoverFill(card, hit)
-    hit.MouseEnter:Connect(function() Tween(arrow, 0.13, { ImageColor3 = Theme.Text }) end)
-    hit.MouseLeave:Connect(function() Tween(arrow, 0.13, { ImageColor3 = Theme.TextMuted }) end)
+    local hovered = false
+    hit.MouseEnter:Connect(function()
+        hovered = true
+        Tween(arrow, 0.13, { ImageColor3 = Theme.Text })
+    end)
+    hit.MouseLeave:Connect(function()
+        hovered = false
+        Tween(arrow, 0.13, { ImageColor3 = Theme.TextMuted })
+    end)
 
     local armed, originalTitle = false, opts.Title or "Button"
     hit.MouseButton1Click:Connect(function()
@@ -2009,7 +2051,9 @@ function Elements.Button(tab, opts, order)
         title.Text = originalTitle
         title.TextColor3 = Theme.Text
         Tween(card, 0.07, { BackgroundColor3 = Theme.SurfaceActive })
-        task.delay(0.07, function() Tween(card, 0.16, { BackgroundColor3 = Theme.SurfaceHover }) end)
+        task.delay(0.07, function()
+            Tween(card, 0.16, { BackgroundColor3 = hovered and Theme.SurfaceHover or Theme.Surface })
+        end)
         Fire(opts.Callback)
     end)
 
@@ -2071,6 +2115,7 @@ function Elements.Toggle(tab, opts, order)
     hit.MouseButton1Click:Connect(function() object:Set(not object.Value) end)
 
     object:Set(opts.Default or opts.Value or false, true)
+    OnThemeChange(function() object:Set(object.Value, true) end)
     return object
 end
 
@@ -2137,6 +2182,7 @@ function Elements.Slider(tab, opts, order)
         Parent = card,
     })
     Paint(valuePill, { BackgroundColor3 = "Inset" })
+    New("UISizeConstraint", { MaxSize = Vector2.new(84, 19), Parent = valuePill })
     Corner(6, valuePill)
     Stroke(valuePill, "BorderSoft")
     Pad(valuePill, 0, 7, 0, 7)
@@ -2297,7 +2343,7 @@ local function Popup(anchor, width, height)
         Parent = group,
     })
     Paint(body, { BackgroundColor3 = "Base" })
-    Acrylic:Add(body, 0.12)
+    Acrylic:Add(body, 0.08)
     Corner(10, body)
     Stroke(body, "Border")
 
@@ -2609,6 +2655,8 @@ function Elements.Dropdown(tab, opts, order)
         if open then CloseActivePopup() else OpenMenu() end
     end)
 
+    OnThemeChange(refreshDisplay)
+
     if opts.Default ~= nil or opts.Value ~= nil then
         object:Set(opts.Default ~= nil and opts.Default or opts.Value, true)
     else
@@ -2743,7 +2791,7 @@ function Elements.Keybind(tab, opts, order)
     New("UISizeConstraint", { MinSize = Vector2.new(46, 24), Parent = pill })
 
     local object = Register({ Instance = card, Value = "None", Mode = mode, Active = false }, opts)
-    local bound, listening = nil, false
+    local bound, listening, listenToken = nil, false, 0
 
     local function displayName(key)
         if key == nil then return "None" end
@@ -2774,29 +2822,41 @@ function Elements.Keybind(tab, opts, order)
 
     local hit = Hitbox(card, 20)
     HoverFill(card, hit)
+    local function stopListening()
+        listening = false
+        Tween(pillStroke, 0.13, { Color = Theme.Border })
+        Tween(keyLabel, 0.13, { TextColor3 = Theme.TextDim })
+    end
+
     hit.MouseButton1Click:Connect(function()
         if listening then return end
         listening = true
+        listenToken = listenToken + 1
+        local token = listenToken
         keyLabel.Text = "..."
         Tween(pillStroke, 0.13, { Color = Theme.Accent })
         Tween(keyLabel, 0.13, { TextColor3 = Theme.Accent })
+
+        -- don't sit in "..." forever if the user wanders off
+        task.delay(5, function()
+            if listening and listenToken == token then
+                stopListening()
+                keyLabel.Text = displayName(bound)
+            end
+        end)
     end)
 
     Connect(UserInputService.InputBegan, function(input, processed)
         if listening then
             if input.UserInputType == Enum.UserInputType.Keyboard then
-                listening = false
-                Tween(pillStroke, 0.13, { Color = Theme.Border })
-                Tween(keyLabel, 0.13, { TextColor3 = Theme.TextDim })
+                stopListening()
                 if input.KeyCode == Enum.KeyCode.Escape then
                     object:Set(nil)
                 else
                     object:Set(input.KeyCode)
                 end
             elseif MOUSE_NAMES[input.UserInputType] then
-                listening = false
-                Tween(pillStroke, 0.13, { Color = Theme.Border })
-                Tween(keyLabel, 0.13, { TextColor3 = Theme.TextDim })
+                stopListening()
                 object:Set(input.UserInputType)
             end
             return
@@ -3341,7 +3401,7 @@ AttachConfig = function(Window, opts)
         tab:Toggle({
             Title       = "Acrylic",
             Description = "Frosted panels. Blurs the whole screen, not just behind the menu.",
-            Default     = Window.Acrylic ~= false,
+            Default     = Window.Acrylic == true,
             Callback    = function(state) Window:SetAcrylic(state) end,
         })
 
@@ -3482,6 +3542,7 @@ function Lyra:SetTheme(name)
     CurrentPalette = name
     RebuildTheme()
     RepaintAll()
+    FireThemeHooks()
     return true
 end
 
@@ -3491,6 +3552,7 @@ function Lyra:SetAccent(color)
     CurrentAccent = color
     RebuildTheme()
     RepaintAll()
+    FireThemeHooks()
     return true
 end
 
