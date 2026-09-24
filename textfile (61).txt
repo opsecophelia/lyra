@@ -206,65 +206,67 @@ local Theme    = {}   -- live token table (identity is stable)
 local Registry = {}   -- { Instance, Property, Token }
 
 local PALETTES = {
+    -- pure neutral greys: no hue bias in either direction
     Dark = {
-        Base          = Color3.fromRGB(18, 19, 23),
-        Sidebar       = Color3.fromRGB(14, 15, 18),
-        Surface       = Color3.fromRGB(26, 27, 32),
-        SurfaceHover  = Color3.fromRGB(32, 33, 39),
-        SurfaceActive = Color3.fromRGB(38, 39, 46),
-        Inset         = Color3.fromRGB(11, 12, 15),
-        Border        = Color3.fromRGB(38, 39, 46),
-        BorderSoft    = Color3.fromRGB(30, 31, 37),
-        Text          = Color3.fromRGB(237, 238, 240),
-        TextDim       = Color3.fromRGB(154, 156, 165),
-        TextMuted     = Color3.fromRGB(106, 108, 120),
+        Base          = Color3.fromRGB(11, 11, 11),
+        Sidebar       = Color3.fromRGB(8, 8, 8),
+        Surface       = Color3.fromRGB(21, 21, 21),
+        SurfaceHover  = Color3.fromRGB(29, 29, 29),
+        SurfaceActive = Color3.fromRGB(38, 38, 38),
+        Inset         = Color3.fromRGB(5, 5, 5),
+        Border        = Color3.fromRGB(36, 36, 36),
+        BorderSoft    = Color3.fromRGB(26, 26, 26),
+        Text          = Color3.fromRGB(250, 250, 250),
+        TextDim       = Color3.fromRGB(160, 160, 160),
+        TextMuted     = Color3.fromRGB(107, 107, 107),
         Shadow        = Color3.fromRGB(0, 0, 0),
     },
     Midnight = {
-        Base          = Color3.fromRGB(8, 8, 10),
+        Base          = Color3.fromRGB(5, 5, 5),
         Sidebar       = Color3.fromRGB(0, 0, 0),
-        Surface       = Color3.fromRGB(17, 17, 20),
-        SurfaceHover  = Color3.fromRGB(24, 24, 28),
-        SurfaceActive = Color3.fromRGB(30, 30, 35),
-        Inset         = Color3.fromRGB(4, 4, 5),
-        Border        = Color3.fromRGB(31, 31, 36),
-        BorderSoft    = Color3.fromRGB(22, 22, 26),
-        Text          = Color3.fromRGB(240, 240, 243),
-        TextDim       = Color3.fromRGB(148, 150, 158),
-        TextMuted     = Color3.fromRGB(100, 102, 112),
+        Surface       = Color3.fromRGB(16, 16, 16),
+        SurfaceHover  = Color3.fromRGB(23, 23, 23),
+        SurfaceActive = Color3.fromRGB(31, 31, 31),
+        Inset         = Color3.fromRGB(2, 2, 2),
+        Border        = Color3.fromRGB(30, 30, 30),
+        BorderSoft    = Color3.fromRGB(20, 20, 20),
+        Text          = Color3.fromRGB(251, 251, 251),
+        TextDim       = Color3.fromRGB(156, 156, 156),
+        TextMuted     = Color3.fromRGB(102, 102, 102),
         Shadow        = Color3.fromRGB(0, 0, 0),
     },
     Graphite = {
-        Base          = Color3.fromRGB(28, 29, 33),
-        Sidebar       = Color3.fromRGB(23, 24, 28),
-        Surface       = Color3.fromRGB(37, 38, 43),
-        SurfaceHover  = Color3.fromRGB(44, 45, 51),
-        SurfaceActive = Color3.fromRGB(51, 52, 59),
-        Inset         = Color3.fromRGB(20, 21, 24),
-        Border        = Color3.fromRGB(51, 52, 59),
-        BorderSoft    = Color3.fromRGB(43, 44, 50),
-        Text          = Color3.fromRGB(240, 241, 243),
-        TextDim       = Color3.fromRGB(163, 165, 173),
-        TextMuted     = Color3.fromRGB(118, 120, 130),
+        Base          = Color3.fromRGB(26, 26, 26),
+        Sidebar       = Color3.fromRGB(21, 21, 21),
+        Surface       = Color3.fromRGB(36, 36, 36),
+        SurfaceHover  = Color3.fromRGB(44, 44, 44),
+        SurfaceActive = Color3.fromRGB(52, 52, 52),
+        Inset         = Color3.fromRGB(18, 18, 18),
+        Border        = Color3.fromRGB(51, 51, 51),
+        BorderSoft    = Color3.fromRGB(42, 42, 42),
+        Text          = Color3.fromRGB(245, 245, 245),
+        TextDim       = Color3.fromRGB(168, 168, 168),
+        TextMuted     = Color3.fromRGB(122, 122, 122),
         Shadow        = Color3.fromRGB(0, 0, 0),
     },
     Light = {
         Base          = Color3.fromRGB(255, 255, 255),
-        Sidebar       = Color3.fromRGB(250, 250, 251),
-        Surface       = Color3.fromRGB(246, 246, 247),
-        SurfaceHover  = Color3.fromRGB(239, 239, 241),
-        SurfaceActive = Color3.fromRGB(230, 230, 233),
-        Inset         = Color3.fromRGB(241, 241, 243),
-        Border        = Color3.fromRGB(228, 228, 232),
-        BorderSoft    = Color3.fromRGB(238, 238, 241),
-        Text          = Color3.fromRGB(24, 24, 27),
-        TextDim       = Color3.fromRGB(95, 96, 105),
-        TextMuted     = Color3.fromRGB(139, 140, 150),
-        Shadow        = Color3.fromRGB(80, 82, 95),
+        Sidebar       = Color3.fromRGB(250, 250, 250),
+        Surface       = Color3.fromRGB(245, 245, 245),
+        SurfaceHover  = Color3.fromRGB(238, 238, 238),
+        SurfaceActive = Color3.fromRGB(229, 229, 229),
+        Inset         = Color3.fromRGB(240, 240, 240),
+        Border        = Color3.fromRGB(228, 228, 228),
+        BorderSoft    = Color3.fromRGB(237, 237, 237),
+        Text          = Color3.fromRGB(23, 23, 23),
+        TextDim       = Color3.fromRGB(92, 92, 92),
+        TextMuted     = Color3.fromRGB(138, 138, 138),
+        Shadow        = Color3.fromRGB(70, 70, 70),
     },
 }
 
 local ACCENTS = {
+    Mono   = Color3.fromRGB(250, 250, 250),
     Indigo = Color3.fromRGB(99, 112, 232),
     Violet = Color3.fromRGB(148, 116, 245),
     Blue   = Color3.fromRGB(70, 144, 245),
@@ -272,11 +274,10 @@ local ACCENTS = {
     Green  = Color3.fromRGB(70, 189, 121),
     Amber  = Color3.fromRGB(234, 168, 66),
     Rose   = Color3.fromRGB(235, 96, 114),
-    Mono   = Color3.fromRGB(235, 236, 240),
 }
 
 local CurrentPalette = "Dark"
-local CurrentAccent  = ACCENTS.Indigo
+local CurrentAccent  = ACCENTS.Mono
 
 local function RebuildTheme()
     local p = PALETTES[CurrentPalette] or PALETTES.Dark
@@ -287,7 +288,7 @@ local function RebuildTheme()
     Theme.AccentHover= a:Lerp(Color3.new(1, 1, 1), 0.14)
     Theme.AccentDim  = a:Lerp(p.Base, 0.45)
     Theme.AccentSoft = a:Lerp(p.Surface, 0.82)
-    Theme.OnAccent   = (Luminance(a) > 0.62) and Color3.fromRGB(16, 16, 20) or Color3.fromRGB(255, 255, 255)
+    Theme.OnAccent   = (Luminance(a) > 0.62) and Color3.fromRGB(10, 10, 10) or Color3.fromRGB(255, 255, 255)
     Theme.Danger     = Color3.fromRGB(232, 92, 106)
     Theme.Success    = Color3.fromRGB(72, 190, 124)
     Theme.Warning    = Color3.fromRGB(233, 170, 70)
@@ -312,6 +313,77 @@ local function RepaintAll()
         local ok = pcall(function() inst[prop] = Theme[token] end)
         if not ok then table.remove(Registry, i) end
     end
+end
+
+--=============================================================================
+-- ACRYLIC  (semi-transparent panels over a blurred scene)
+--=============================================================================
+--
+-- Roblox has no per-element backdrop blur. The only blur available is a
+-- BlurEffect in Lighting, which blurs the whole screen -- so "glass" here means
+-- a translucent panel sitting over a globally blurred world. It reads correctly,
+-- but the game behind the menu blurs too. Hence the toggle.
+
+local BLUR_SIZE = 14
+
+local Acrylic = {
+    Enabled  = false,
+    Blur     = nil,
+    Registry = {},   -- { instance, transparency }
+}
+
+function Acrylic:Ensure()
+    if self.Blur and self.Blur.Parent then return self.Blur end
+    local ok, blur = pcall(function()
+        local b = Instance.new("BlurEffect")
+        b.Name = "LyraAcrylic"
+        b.Size = 0
+        b.Parent = Lighting
+        return b
+    end)
+    self.Blur = ok and blur or nil
+    return self.Blur
+end
+
+-- register a surface that should go translucent while acrylic is on
+function Acrylic:Add(inst, transparency)
+    table.insert(self.Registry, { inst, transparency })
+    if self.Enabled then inst.BackgroundTransparency = transparency end
+    return inst
+end
+
+function Acrylic:Apply(animate)
+    for i = #self.Registry, 1, -1 do
+        local entry = self.Registry[i]
+        local target = self.Enabled and entry[2] or 0
+        local ok = pcall(function()
+            if animate then
+                Tween(entry[1], 0.2, { BackgroundTransparency = target })
+            else
+                entry[1].BackgroundTransparency = target
+            end
+        end)
+        if not ok then table.remove(self.Registry, i) end
+    end
+end
+
+function Acrylic:SetBlur(on)
+    local blur = self:Ensure()
+    if not blur then return end
+    pcall(function() Tween(blur, 0.25, { Size = (on and self.Enabled) and BLUR_SIZE or 0 }) end)
+end
+
+function Acrylic:Set(enabled, visible)
+    self.Enabled = enabled and true or false
+    self:Apply(true)
+    self:SetBlur(visible ~= false)
+end
+
+function Acrylic:Teardown()
+    if self.Blur then pcall(function() self.Blur:Destroy() end) end
+    self.Blur = nil
+    self.Registry = {}
+    self.Enabled = false
 end
 
 --=============================================================================
@@ -531,8 +603,8 @@ local function Scroller(props)
     local p = props or {}
     p.BackgroundTransparency   = 1
     p.BorderSizePixel          = 0
-    p.ScrollBarThickness       = 3
-    p.ScrollBarImageTransparency = 0.35
+    p.ScrollBarThickness       = 2
+    p.ScrollBarImageTransparency = 0.7
     p.ScrollingDirection       = Enum.ScrollingDirection.Y
     p.AutomaticCanvasSize      = Enum.AutomaticSize.Y
     p.CanvasSize               = UDim2.new()
@@ -610,6 +682,7 @@ local function Card(parent, order, height)
         Parent = parent,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
+    Acrylic:Add(card, 0.2)
     Corner(8, card)
     Stroke(card, "BorderSoft")
     return card
@@ -709,6 +782,7 @@ function Lyra:Notify(opts)
         Parent = holder,
     })
     Paint(card, { BackgroundColor3 = "Surface" })
+    Acrylic:Add(card, 0.08)
     Corner(10, card)
     Stroke(card, "Border")
 
@@ -842,6 +916,7 @@ local function CreateDialog(opts)
         Parent = dim,
     })
     Paint(card, { BackgroundColor3 = "Base" })
+    Acrylic:Add(card, 0.06)
     Corner(12, card)
     Stroke(card, "Border")
     AttachShadow(card, 30, 0.5)
@@ -1034,8 +1109,20 @@ function Lyra:CreateWindow(opts)
         Parent = root,
     })
     Paint(main, { BackgroundColor3 = "Base" })
+    Acrylic:Add(main, 0.1)
     Corner(12, main)
     Stroke(main, "Border")
+
+    -- a single lit pixel along the top edge; only shown with acrylic on
+    local topEdge = New("Frame", {
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(14, 0),
+        Size = UDim2.new(1, -28, 0, 1),
+        ZIndex = 30,
+        Parent = main,
+    })
 
     ------------------------------------------------------------------ sidebar
     local sidebar = New("Frame", {
@@ -1046,6 +1133,7 @@ function Lyra:CreateWindow(opts)
         Parent = main,
     })
     Paint(sidebar, { BackgroundColor3 = "Sidebar" })
+    Acrylic:Add(sidebar, 0.05)
 
     local sidebarEdge = New("Frame", {
         BorderSizePixel = 0,
@@ -1335,18 +1423,19 @@ function Lyra:CreateWindow(opts)
             ZIndex = 40,
             Parent = main,
         })
-        local dot = New("ImageLabel", {
-            BackgroundTransparency = 1,
-            AnchorPoint = Vector2.new(1, 1),
-            Position = UDim2.new(1, -4, 1, -4),
-            Size = UDim2.fromOffset(9, 9),
-            Image = Icons:Resolve("chevron-right") or "",
-            Rotation = 45,
-            ImageTransparency = 0.45,
-            ZIndex = 40,
-            Parent = grip,
-        })
-        Paint(dot, { ImageColor3 = "TextMuted" })
+        for i, len in ipairs({ 6, 11 }) do
+            local tick = New("Frame", {
+                BorderSizePixel = 0,
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(1, -4 - (i - 1) * 4, 1, -4 - (i - 1) * 4),
+                Size = UDim2.fromOffset(len, 1),
+                Rotation = -45,
+                BackgroundTransparency = 0.55,
+                ZIndex = 40,
+                Parent = grip,
+            })
+            Paint(tick, { BackgroundColor3 = "TextMuted" })
+        end
 
         local resizing, startPos, startSize = false, nil, nil
         grip.InputBegan:Connect(function(input)
@@ -1392,6 +1481,7 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(minimizePill, { BackgroundColor3 = "Surface" })
+        Acrylic:Add(minimizePill, 0.1)
         Corner(10, minimizePill)
         Stroke(minimizePill, "Border")
         AttachShadow(minimizePill, 20, 0.6)
@@ -1457,6 +1547,7 @@ function Lyra:CreateWindow(opts)
         self._minimized = true
         CloseActivePopup()
         if not minimizePill then BuildPill() end
+        Acrylic:SetBlur(false)
         root.Visible = false
         minimizePill.Visible = true
         minimizePill.Size = UDim2.fromOffset(0, 0)
@@ -1468,6 +1559,7 @@ function Lyra:CreateWindow(opts)
         self._minimized = false
         if minimizePill then minimizePill.Visible = false end
         root.Visible = self._open
+        Acrylic:SetBlur(self._open)
         main.Size = UDim2.fromScale(0.97, 0.97)
         Tween(main, 0.24, { Size = UDim2.fromScale(1, 1) }, Enum.EasingStyle.Quint)
     end
@@ -1476,6 +1568,7 @@ function Lyra:CreateWindow(opts)
         if state == nil then state = not self._open end
         self._open = state
         CloseActivePopup()
+        Acrylic:SetBlur(state and not self._minimized)
         if state then
             root.Visible = not self._minimized
             if minimizePill then minimizePill.Visible = self._minimized end
@@ -1488,9 +1581,17 @@ function Lyra:CreateWindow(opts)
         return self._open
     end
 
+    function Window:SetAcrylic(state)
+        Acrylic:Set(state, self._open and not self._minimized)
+        Tween(topEdge, 0.2, { BackgroundTransparency = Acrylic.Enabled and 0.86 or 1 })
+        self.Acrylic = Acrylic.Enabled
+        return Acrylic.Enabled
+    end
+
     function Window:OnUnload(fn) table.insert(self._unloadFns, fn) end
 
     function Window:Destroy()
+        Acrylic:SetBlur(false)
         for _, fn in ipairs(self._unloadFns) do pcall(fn) end
         if minimizePill then minimizePill:Destroy() end
         root:Destroy()
@@ -1541,6 +1642,7 @@ function Lyra:CreateWindow(opts)
             Parent = GUI,
         })
         Paint(fab, { BackgroundColor3 = "Surface" })
+        Acrylic:Add(fab, 0.1)
         New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fab })
         Stroke(fab, "Border")
         AttachShadow(fab, 18, 0.6)
@@ -1574,7 +1676,6 @@ function Lyra:CreateWindow(opts)
             Tween(activeTab._btn, 0.14, { BackgroundTransparency = 1 })
             Tween(activeTab._label, 0.14, { TextColor3 = Theme.TextDim })
             if activeTab._icon then Tween(activeTab._icon, 0.14, { ImageColor3 = Theme.TextDim }) end
-            Tween(activeTab._marker, 0.14, { Size = UDim2.fromOffset(2, 0) })
         end
 
         activeTab = tab
@@ -1588,10 +1689,9 @@ function Lyra:CreateWindow(opts)
         tab._page.GroupTransparency = 1
         tab._page.Position = UDim2.fromOffset(0, 6)
         Tween(tab._page, 0.2, { GroupTransparency = 0, Position = UDim2.fromOffset(0, 0) }, Enum.EasingStyle.Quint)
-        Tween(tab._btn, 0.14, { BackgroundTransparency = 0, BackgroundColor3 = Theme.SurfaceHover })
+        Tween(tab._btn, 0.14, { BackgroundTransparency = 0, BackgroundColor3 = Theme.SurfaceActive })
         Tween(tab._label, 0.14, { TextColor3 = Theme.Text })
-        if tab._icon then Tween(tab._icon, 0.14, { ImageColor3 = Theme.Accent }) end
-        Tween(tab._marker, 0.2, { Size = UDim2.fromOffset(2, 14) }, Enum.EasingStyle.Quint)
+        if tab._icon then Tween(tab._icon, 0.14, { ImageColor3 = Theme.Text }) end
     end
 
     function Window:AddTab(tabOpts)
@@ -1619,17 +1719,6 @@ function Lyra:CreateWindow(opts)
         })
         Paint(btn, { BackgroundColor3 = "SurfaceHover" })
         Corner(7, btn)
-
-        local marker = New("Frame", {
-            BorderSizePixel = 0,
-            AnchorPoint = Vector2.new(0, 0.5),
-            Position = UDim2.new(0, -7, 0.5, 0),
-            Size = UDim2.fromOffset(2, 0),
-            ZIndex = 14,
-            Parent = btn,
-        })
-        Paint(marker, { BackgroundColor3 = "Accent" })
-        Corner(2, marker)
 
         local iconId = Icons:Resolve(tabOpts.Icon)
         local labelX = 10
@@ -1692,7 +1781,7 @@ function Lyra:CreateWindow(opts)
         Pad(scroller, 14, 16, 16, 16)
         List(scroller, 7)
 
-        tab._btn, tab._label, tab._icon, tab._marker = btn, label, icon, marker
+        tab._btn, tab._label, tab._icon = btn, label, icon
         tab._page, tab._container = page, scroller
 
         ------------------------------------------------------------ element api
@@ -1730,6 +1819,8 @@ function Lyra:CreateWindow(opts)
     -- entrance
     main.Size = UDim2.fromScale(0.96, 0.96)
     Tween(main, 0.3, { Size = UDim2.fromScale(1, 1) }, Enum.EasingStyle.Quint)
+
+    Window:SetAcrylic(opts.Acrylic ~= false)
 
     if AttachConfig then AttachConfig(Window, opts) end
 
@@ -2091,6 +2182,8 @@ function Elements.Slider(tab, opts, order)
     })
     Paint(knob, { BackgroundColor3 = "Text" })
     New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = knob })
+    -- a ring in the card colour keeps the knob visible on a white-accent fill
+    Paint(New("UIStroke", { Thickness = 2.5, Parent = knob }), { Color = "Surface" })
 
     local hitArea = New("TextButton", {
         Text = "",
@@ -2203,6 +2296,7 @@ local function Popup(anchor, width, height)
         Parent = group,
     })
     Paint(body, { BackgroundColor3 = "Base" })
+    Acrylic:Add(body, 0.06)
     Corner(10, body)
     Stroke(body, "Border")
 
@@ -3228,7 +3322,7 @@ AttachConfig = function(Window, opts)
             Title = "Accent",
             Description = "Highlight colour",
             Values = accentNames,
-            Default = "Indigo",
+            Default = "Mono",
             Callback = function(v)
                 Lyra:SetAccent(v)
                 if accentPicker then accentPicker:Set(ACCENTS[v] or Theme.Accent, nil, true) end
@@ -3242,6 +3336,13 @@ AttachConfig = function(Window, opts)
         })
 
         tab:Section("Interface")
+
+        tab:Toggle({
+            Title       = "Acrylic",
+            Description = "Frosted panels. Blurs the whole screen, not just behind the menu.",
+            Default     = Window.Acrylic ~= false,
+            Callback    = function(state) Window:SetAcrylic(state) end,
+        })
 
         tab:Keybind({
             Title = "Toggle menu",
@@ -3418,6 +3519,7 @@ function Lyra:Unload()
     self.Windows = {}
     self.Options = {}
     self.Flags = {}
+    Acrylic:Teardown()
     if GUI then pcall(function() GUI:Destroy() end) end
     GUI, Overlay, NotifyRoot = nil, nil, nil
     env.__LYRA_ROOT = nil
