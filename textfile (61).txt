@@ -724,14 +724,29 @@ end
 
 -- left-hand label column shared by toggles / sliders / dropdowns / etc.
 -- grows the card vertically when a description wraps onto more lines
-local function CardLabel(card, title, desc, rightPad, minHeight)
+local function CardLabel(card, title, desc, rightPad, minHeight, icon)
     minHeight = minHeight or card.Size.Y.Offset
+
+    local left = 13
+    if icon then
+        local img = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            AnchorPoint = Vector2.new(0, 0.5),
+            Position = UDim2.new(0, 13, 0.5, 0),
+            Size = UDim2.fromOffset(16, 16),
+            Image = icon,
+            ZIndex = 13,
+            Parent = card,
+        })
+        Paint(img, { ImageColor3 = "TextDim" })
+        left = 39
+    end
 
     local holder = New("Frame", {
         BackgroundTransparency = 1,
         AnchorPoint = Vector2.new(0, 0.5),
-        Position = UDim2.new(0, 13, 0.5, 0),
-        Size = UDim2.new(1, -(rightPad or 70) - 13, 0, 0),
+        Position = UDim2.new(0, left, 0.5, 0),
+        Size = UDim2.new(1, -(rightPad or 70) - left, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         Parent = card,
     })
@@ -953,7 +968,7 @@ local function CreateDialog(opts)
     Acrylic:Add(card, 0.08)
     Corner(12, card)
     Stroke(card, "Border")
-    AttachShadow(card, 26, 0.62, 9)
+    AttachShadow(card, 18, 0.7, 6)
 
     local inner = New("Frame", {
         BackgroundTransparency = 1,
@@ -1130,7 +1145,21 @@ function Lyra:CreateWindow(opts)
     })
     Window.Root = root
 
-    Shadow(root, 24, 0.74, 7)
+    -- opt-in only; the rim below does the separating
+    if opts.Shadow == true then Shadow(root, 16, 0.82, 5) end
+
+    local edge = New("Frame", {
+        Name = "Edge",
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BackgroundTransparency = 0.4,
+        BorderSizePixel = 0,
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.fromScale(0.5, 0.5),
+        Size = UDim2.new(1, 2, 1, 2),
+        ZIndex = 10,
+        Parent = root,
+    })
+    Corner(13, edge)
 
     local main = New("Frame", {
         Name = "Main",
@@ -1520,7 +1549,7 @@ function Lyra:CreateWindow(opts)
         Acrylic:Add(minimizePill, 0.1)
         Corner(10, minimizePill)
         Stroke(minimizePill, "Border")
-        AttachShadow(minimizePill, 14, 0.74, 4)
+        AttachShadow(minimizePill, 12, 0.78, 3)
         Pad(minimizePill, 0, 12, 0, 12)
 
         local row = New("Frame", {
@@ -1681,7 +1710,7 @@ function Lyra:CreateWindow(opts)
         Acrylic:Add(fab, 0.1)
         New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fab })
         Stroke(fab, "Border")
-        AttachShadow(fab, 14, 0.74, 4)
+        AttachShadow(fab, 12, 0.78, 3)
         local img = New("ImageLabel", {
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1995,7 +2024,7 @@ end
 function Elements.Paragraph(tab, opts, order)
     opts = opts or {}
     local card = Card(tab._container, order, 44)
-    local title, desc = CardLabel(card, opts.Title or "Paragraph", opts.Content or opts.Description or "", 14, 44)
+    local title, desc = CardLabel(card, opts.Title or "Paragraph", opts.Content or opts.Description or "", 14, 44, Icons:Resolve(opts.Icon))
 
     local object = Register({ Instance = card }, opts)
     function object:SetTitle(t) title.Text = t end
@@ -2008,14 +2037,14 @@ end
 function Elements.Button(tab, opts, order)
     opts = opts or {}
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Button", opts.Description, 44, 38)
+    local title = CardLabel(card, opts.Title or "Button", opts.Description, 44, 38, Icons:Resolve(opts.Icon))
 
     local arrow = New("ImageLabel", {
         BackgroundTransparency = 1,
         AnchorPoint = Vector2.new(1, 0.5),
         Position = UDim2.new(1, -13, 0.5, 0),
         Size = UDim2.fromOffset(14, 14),
-        Image = Icons:Resolve(opts.Icon or "chevron-right") or "",
+        Image = Icons:Resolve("chevron-right") or "",
         Parent = card,
     })
     Paint(arrow, { ImageColor3 = "TextMuted" })
@@ -2067,7 +2096,7 @@ end
 function Elements.Toggle(tab, opts, order)
     opts = opts or {}
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Toggle", opts.Description, 62, 38)
+    local title = CardLabel(card, opts.Title or "Toggle", opts.Description, 62, 38, Icons:Resolve(opts.Icon))
 
     local track = New("Frame", {
         BorderSizePixel = 0,
@@ -2131,10 +2160,25 @@ function Elements.Slider(tab, opts, order)
 
     local card = Card(tab._container, order, 54)
 
+    local labelX = 13
+    local sliderIcon = Icons:Resolve(opts.Icon)
+    if sliderIcon then
+        local img = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(13, 12),
+            Size = UDim2.fromOffset(16, 16),
+            Image = sliderIcon,
+            ZIndex = 13,
+            Parent = card,
+        })
+        Paint(img, { ImageColor3 = "TextDim" })
+        labelX = 39
+    end
+
     local holder = New("Frame", {
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(13, 10),
-        Size = UDim2.new(1, -103, 0, 0),
+        Position = UDim2.fromOffset(labelX, 10),
+        Size = UDim2.new(1, -labelX - 90, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         ZIndex = 13,
         Parent = card,
@@ -2388,7 +2432,7 @@ function Elements.Dropdown(tab, opts, order)
     local values = opts.Values or opts.Options or {}
 
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Dropdown", opts.Description, 168, 38)
+    local title = CardLabel(card, opts.Title or "Dropdown", opts.Description, 168, 38, Icons:Resolve(opts.Icon))
 
     local control = New("Frame", {
         BorderSizePixel = 0,
@@ -2670,7 +2714,7 @@ end
 function Elements.Input(tab, opts, order)
     opts = opts or {}
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Input", opts.Description, 168, 38)
+    local title = CardLabel(card, opts.Title or "Input", opts.Description, 168, 38, Icons:Resolve(opts.Icon))
 
     local box = New("Frame", {
         BorderSizePixel = 0,
@@ -2760,7 +2804,7 @@ function Elements.Keybind(tab, opts, order)
     local mode = opts.Mode or "Toggle"   -- Toggle | Hold | Always
 
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Keybind", opts.Description, 110, 38)
+    local title = CardLabel(card, opts.Title or "Keybind", opts.Description, 110, 38, Icons:Resolve(opts.Icon))
 
     local pill = New("Frame", {
         BorderSizePixel = 0,
@@ -2927,7 +2971,7 @@ function Elements.Colorpicker(tab, opts, order)
     local useAlpha = opts.Transparency ~= nil or opts.Alpha ~= nil
 
     local card = Card(tab._container, order, 38)
-    local title = CardLabel(card, opts.Title or "Colour", opts.Description, 70, 38)
+    local title = CardLabel(card, opts.Title or "Colour", opts.Description, 70, 38, Icons:Resolve(opts.Icon))
 
     local swatch = New("Frame", {
         BorderSizePixel = 0,
@@ -3547,47 +3591,3 @@ function Lyra:SetTheme(name)
 end
 
 function Lyra:SetAccent(color)
-    if type(color) == "string" then color = ACCENTS[color] end
-    if typeof(color) ~= "Color3" then return false end
-    CurrentAccent = color
-    RebuildTheme()
-    RepaintAll()
-    FireThemeHooks()
-    return true
-end
-
-function Lyra:SetFont(name)
-    BuildFonts(name)
-    return true
-end
-
-function Lyra:GetFlag(flag, default)
-    local v = self.Flags[flag]
-    if v == nil then return default end
-    return v
-end
-
-function Lyra:Toggle(state)
-    for _, w in ipairs(self.Windows) do w:Toggle(state) end
-end
-
-function Lyra:Unload()
-    if self.Unloaded then return end
-    self.Unloaded = true
-    for _, c in ipairs(Connections) do pcall(function() c:Disconnect() end) end
-    Connections = {}
-    for _, w in ipairs(self.Windows) do
-        for _, fn in ipairs(w._unloadFns or {}) do pcall(fn) end
-    end
-    self.Windows = {}
-    self.Options = {}
-    self.Flags = {}
-    Acrylic:Teardown()
-    if GUI then pcall(function() GUI:Destroy() end) end
-    GUI, Overlay, NotifyRoot = nil, nil, nil
-    env.__LYRA_ROOT = nil
-end
-
-Lyra.Destroy = Lyra.Unload
-
-return Lyra
